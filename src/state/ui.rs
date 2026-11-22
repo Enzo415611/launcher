@@ -15,4 +15,5 @@ impl Default for UiState {
 pub enum Page {
     Auth,
     Launcher,
+    Config,
 }

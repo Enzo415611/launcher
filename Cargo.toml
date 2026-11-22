@@ -1,14 +1,18 @@
 [package]
-name = "launcher"
+name = "r-launcher"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 anyhow = "1.0.104"
+arboard = "3.7.0"
+async-stream = "0.3.6"
 dirs = "7.0.0"
+dotenvy = "0.15.7"
 iced = { version = "0.14.0", features = ["tokio"] }
 indexmap = "2.14.2"
 keyring = "4.2.0"
 lighty-launcher = { version = "26.11.0", features = ["keyring", "events", "fabric", "modrinth", "vanilla", "lighty_updater"] }
+open = "5.4.5"
 toasty = { version = "0.11.0", features = ["sqlite"] }
 tokio = "1.54.1"

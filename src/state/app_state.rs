@@ -1,23 +1,19 @@
-use std::sync::Arc;
-
 use iced::Task;
-use lighty_launcher::{UserProfile, auth::MicrosoftAuth, event::EventBus};
+use lighty_launcher::event::EventBus;
 use toasty::Db;
-use tokio::sync::Mutex;
 
 use crate::{
     events::{db::DbEvent::InitDb, update::AppEvent},
-    state::{instance::InstanceState, ui::UiState},
+    state::{auth::AuthState, instance::InstanceState, ui::UiState},
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub db: Option<Db>,
-    pub profile: Option<UserProfile>,
     pub event_bus: EventBus,
-    pub auth: Arc<Mutex<Option<MicrosoftAuth>>>,
     pub instance: InstanceState,
     pub ui_state: UiState,
+    pub auth_state: AuthState,
 }
 
 impl std::fmt::Display for AppState {
@@ -31,11 +27,10 @@ impl AppState {
         (
             Self {
                 db: None,
-                profile: None,
                 event_bus: EventBus::new(100),
-                auth: Arc::new(Mutex::new(None)),
                 instance: InstanceState::default(),
                 ui_state: UiState::default(),
+                auth_state: AuthState::default(),
             },
             Task::batch(vec![Task::done(AppEvent::Db(InitDb))]),
         )

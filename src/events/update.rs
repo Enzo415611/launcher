@@ -4,7 +4,7 @@ use crate::{
 };
 use iced::Task;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AppEvent {
     Db(DbEvent),
     Err(String),

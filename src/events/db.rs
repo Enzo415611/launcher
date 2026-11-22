@@ -7,12 +7,12 @@ use crate::{
         db::init_db,
         instance_model::{InstanceModel, LoaderModel},
     },
-    events::{auth::AuthEvent, db::DbEvent::InitDbFuture, update::AppEvent},
+    events::{db::DbEvent::InitDbFuture, update::AppEvent},
     launcher::instance::Instance,
     state::app_state::AppState,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DbEvent {
     InitDb,
     InitDbFuture(Result<Db, String>),
@@ -38,10 +38,7 @@ impl AppState {
                     Ok(db) => self.db = Some(db),
                     Err(_) => {}
                 }
-                Task::batch(vec![
-                    Task::done(AppEvent::Auth(AuthEvent::LoadProfile)),
-                    Task::done(AppEvent::Db(DbEvent::GetAllInstances)),
-                ])
+                Task::batch(vec![Task::done(AppEvent::Db(DbEvent::GetAllInstances))])
             }
             DbEvent::GetAllInstances => {
                 if let Some(mut db) = self.db.clone() {
