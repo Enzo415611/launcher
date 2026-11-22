@@ -5,7 +5,10 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.104"
+dirs = "7.0.0"
 iced = { version = "0.14.0", features = ["tokio"] }
+indexmap = "2.14.2"
 keyring = "4.2.0"
 lighty-launcher = { version = "26.11.0", features = ["keyring", "events", "fabric", "modrinth", "vanilla", "lighty_updater"] }
+toasty = { version = "0.11.0", features = ["sqlite"] }
 tokio = "1.54.1"
