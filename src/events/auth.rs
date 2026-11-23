@@ -18,6 +18,43 @@ pub enum AuthEvent {
 impl AppState {
     pub fn auth_events(&mut self, e: AuthEvent) -> Task<AppEvent> {
         match e {
+            AuthEvent::StartAuth => {
+                self.auth_state.is_auth_mode = true;
+                let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
+                let auth = self.auth_state.auth.clone();
+                let event_bus = self.event_bus.clone();
+
+                let auth_task = Task::perform(load_profile(auth, event_bus, tx), |r| match r {
+                    Ok(profile) => AppEvent::Auth(AuthEvent::LoadProfileFuture(profile)),
+                    Err(err) => AppEvent::Err(err.to_string()),
+                });
+
+                let callback_task = Task::run(
+                    async_stream::stream! {
+                        while let Some(event) = rx.recv().await {
+                           yield event;
+                        }
+                    },
+                    |event| event,
+                );
+                Task::batch(vec![auth_task, callback_task])
+            }
+            AuthEvent::DeviceCode(code, url) => {
+                self.auth_state.code = code;
+                self.auth_state.url = url;
+                Task::batch(vec![
+                    Task::done(AppEvent::Auth(AuthEvent::CopyCode)),
+                    Task::done(AppEvent::Auth(AuthEvent::OpenUrl)),
+                ])
+            }
+            AuthEvent::LoadProfileFuture(profile) => {
+                self.auth_state.profile = Some(profile);
+                self.ui_state.current_page = Page::Launcher;
+                self.auth_state.is_auth_mode = true;
+                self.auth_state.code = String::new();
+                self.auth_state.url = String::new();
+                Task::none()
+            }
             AuthEvent::CopyCode => {
                 let mut clipboard = Clipboard::new().unwrap();
                 if let Err(err) = clipboard.set_text(&self.auth_state.code) {
@@ -32,36 +69,6 @@ impl AppState {
                     }
                 }
 
-                Task::none()
-            }
-            AuthEvent::StartAuth => {
-                let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
-                let auth = self.auth_state.auth.clone();
-                let event_bus = self.event_bus.clone();
-
-                let auth_task = Task::perform(load_profile(auth, event_bus, tx), |r| match r {
-                    Ok(profile) => AppEvent::Auth(AuthEvent::LoadProfileFuture(profile)),
-                    Err(err) => AppEvent::Err(err.to_string()),
-                });
-                let callback_task = Task::run(
-                    async_stream::stream! {
-                        while let Some(event) = rx.recv().await {
-                           yield event;
-                        }
-                    },
-                    |event| event,
-                );
-                Task::batch(vec![auth_task, callback_task])
-            }
-            AuthEvent::DeviceCode(code, url) => {
-                println!("{} {}", code, url);
-                self.auth_state.code = code;
-                self.auth_state.url = url;
-                Task::none()
-            }
-            AuthEvent::LoadProfileFuture(profile) => {
-                self.auth_state.profile = Some(profile);
-                self.ui_state.current_page = Page::Launcher;
                 Task::none()
             }
         }

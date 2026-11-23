@@ -5,6 +5,7 @@ use tokio::sync::Mutex;
 
 #[derive(Clone)]
 pub struct AuthState {
+    pub is_auth_mode: bool,
     pub profile: Option<UserProfile>,
     pub auth: Arc<Mutex<Option<MicrosoftAuth>>>,
     pub code: String,
@@ -13,10 +14,9 @@ pub struct AuthState {
 
 impl Default for AuthState {
     fn default() -> Self {
-        let client_id = std::env::var("CLIENT_ID").expect("CLIENT_ID Not Found");
-        println!("{}", client_id);
-        let auth = MicrosoftAuth::new(client_id);
+        let auth = MicrosoftAuth::new(std::env::var("CLIENT_ID").expect("CLIENT_ID Not Found"));
         Self {
+            is_auth_mode: false,
             profile: None,
             auth: Arc::new(Mutex::new(Some(auth))),
             code: String::new(),

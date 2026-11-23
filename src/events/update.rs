@@ -21,6 +21,10 @@ impl AppState {
                 Task::none()
             }
             AppEvent::EventBus(event) => match event {
+                lighty_launcher::event::Event::Auth(e) => {
+                    println!("{:?}", e);
+                    Task::none()
+                }
                 _ => {
                     println!("{:?}", event);
                     Task::none()
