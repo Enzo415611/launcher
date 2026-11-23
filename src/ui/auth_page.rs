@@ -1,5 +1,5 @@
 use iced::{
-    Alignment, Element,
+    Length, Widget,
     widget::{button, column, container, text},
 };
 
@@ -9,7 +9,7 @@ use crate::{
 };
 
 impl AppState {
-    pub fn auth_page(&self) -> Element<'_, AppEvent> {
+    pub fn auth_page(&self) -> impl Widget<AppEvent> {
         let code_and_url_button =
             if !self.auth_state.url.is_empty() && !self.auth_state.code.is_empty() {
                 Some(column![
@@ -22,10 +22,10 @@ impl AppState {
                 None
             };
         let content = column![
-            button("Microsoft Login").on_press(AppEvent::Auth(AuthEvent::StartAuth)),
+            button(text(format!("Login with Microsoft")))
+                .on_press(AppEvent::Auth(AuthEvent::StartAuth)),
             code_and_url_button,
-        ]
-        .align_x(Alignment::Center);
-        container(content).into()
+        ];
+        container(content).center(Length::Fill)
     }
 }
