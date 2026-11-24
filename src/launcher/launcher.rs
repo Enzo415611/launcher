@@ -24,7 +24,7 @@ pub async fn load_profile(
 
     let profile = match load_with_refresh_token(&mut auth, &event_bus).await {
         Ok(profile) => profile,
-        Err(_) => {
+        Err(err) => {
             auth.set_device_code_callback(move |code, url| {
                 let _ = tx.send(AppEvent::Auth(AuthEvent::DeviceCode(
                     code.to_string(),

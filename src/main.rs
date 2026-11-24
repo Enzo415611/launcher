@@ -1,4 +1,4 @@
-use iced::Theme;
+use iced::{Program, Theme};
 
 use crate::{state::app_state::AppState, subscription::subscription};
 
