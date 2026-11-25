@@ -20,11 +20,12 @@ impl Default for UiState {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Page {
     Auth,
     Launcher,
     Config,
+    CreateInstance,
 }
 
 #[derive(Clone)]

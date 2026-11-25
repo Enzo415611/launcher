@@ -6,7 +6,7 @@ use crate::db::instance_model::{InstanceModel, LoaderModel};
 pub struct Instance {
     pub id: u32,
     pub name: String,
-    pub loader: InstanceLoader,
+    pub loader: Option<InstanceLoader>,
     pub loader_version: String,
     pub mc_version: String,
 }
@@ -16,7 +16,7 @@ impl From<InstanceModel> for Instance {
         Self {
             id: i.id,
             name: i.name,
-            loader: InstanceLoader::from(i.loader),
+            loader: Some(InstanceLoader::from(i.loader)),
             loader_version: i.loader_version,
             mc_version: i.mc_version,
         }
@@ -27,6 +27,19 @@ impl From<InstanceModel> for Instance {
 pub enum InstanceLoader {
     Vanilla,
     Fabric,
+}
+
+impl ToString for InstanceLoader {
+    fn to_string(&self) -> String {
+        match self {
+            InstanceLoader::Vanilla => String::from("Vanilla"),
+            InstanceLoader::Fabric => String::from("Fabric"),
+        }
+    }
+}
+
+impl InstanceLoader {
+    pub const ALL: [InstanceLoader; 2] = [InstanceLoader::Vanilla, InstanceLoader::Fabric];
 }
 
 impl Default for InstanceLoader {
@@ -72,7 +85,7 @@ pub async fn load_instance(
     // criar uma instancia passando o nome, loader, loader versions(vanilla não precisa) e game version
     let mut instance = VersionBuilder::new(
         &instance.name,
-        Loader::from(&instance.loader),
+        Loader::from(instance.loader.as_ref().unwrap_or(&InstanceLoader::Vanilla)),
         &instance.loader_version,
         &instance.mc_version,
     );

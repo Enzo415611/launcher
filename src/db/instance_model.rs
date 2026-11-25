@@ -16,7 +16,7 @@ impl From<&Instance> for InstanceModel {
         Self {
             id: i.id,
             name: i.name.to_string(),
-            loader: LoaderModel::from(&i.loader),
+            loader: LoaderModel::from(i.loader.as_ref().unwrap_or(&InstanceLoader::Vanilla)),
             loader_version: i.loader_version.to_string(),
             mc_version: i.mc_version.to_string(),
         }

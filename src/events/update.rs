@@ -1,8 +1,8 @@
 use crate::{
     AppState,
-    events::{auth::AuthEvent, db::DbEvent},
+    events::{auth::AuthEvent, db::DbEvent, instance::InstanceEvents, ui::UiEvents},
 };
-use iced::{Task, widget::pane_grid};
+use iced::Task;
 
 #[derive(Debug, Clone)]
 pub enum AppEvent {
@@ -10,7 +10,8 @@ pub enum AppEvent {
     Err(String),
     EventBus(lighty_launcher::event::Event),
     Auth(AuthEvent),
-    PaneResize(pane_grid::ResizeEvent),
+    Ui(UiEvents),
+    Instance(InstanceEvents),
 }
 
 impl AppState {
@@ -21,6 +22,7 @@ impl AppState {
                 eprintln!("{}", err);
                 Task::none()
             }
+            AppEvent::Ui(e) => self.ui_events(e),
             AppEvent::EventBus(event) => match event {
                 lighty_launcher::event::Event::Auth(e) => {
                     println!("{:?}", e);
@@ -32,10 +34,7 @@ impl AppState {
                 }
             },
             AppEvent::Auth(e) => self.auth_events(e),
-            AppEvent::PaneResize(r) => {
-                self.ui_state.launcher_grid.resize(r.split, r.ratio);
-                Task::none()
-            }
+            AppEvent::Instance(e) => self.instance_events(e),
         }
     }
 }

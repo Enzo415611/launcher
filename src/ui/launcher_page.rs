@@ -1,11 +1,14 @@
 use iced::{
     Alignment, Element, Length, Widget,
-    widget::{Scrollable, button, column, container, pane_grid, text},
+    widget::{Scrollable, column, container, pane_grid},
 };
 
 use crate::{
-    events::update::AppEvent,
-    state::{app_state::AppState, ui::Panes},
+    events::{ui::UiEvents, update::AppEvent},
+    state::{
+        app_state::AppState,
+        ui::{Page, Panes},
+    },
     ui::components::{instance_button::instance_button, rbutton::r_button},
 };
 
@@ -17,14 +20,15 @@ impl AppState {
                 Panes::Right => self.right_grid(),
             })
         })
-        .on_resize(5, AppEvent::PaneResize);
+        .on_resize(5, |e| AppEvent::Ui(UiEvents::PaneResize(e)));
 
         container(grid)
     }
 
     fn instance_list(&self) -> Element<'_, AppEvent> {
         container(column![
-            r_button("New Instance"),
+            r_button("Create Instance")
+                .on_press(AppEvent::Ui(UiEvents::SwapPage(Page::CreateInstance))),
             Scrollable::new(
                 column![].extend(self.instance.instances.iter().map(|i| instance_button(i)),)
             )
@@ -40,8 +44,8 @@ impl AppState {
         };
         container(
             column![profile_button]
-                .height(Length::Fill)
-                .align_x(Alignment::Start),
+                .width(Length::Fill)
+                .align_x(Alignment::End),
         )
         .boxed()
     }
