@@ -10,7 +10,6 @@ use crate::{
 #[derive(Clone)]
 pub struct AppState {
     pub db: Option<Db>,
-    pub event_bus: EventBus,
     pub instance: InstanceState,
     pub ui_state: UiState,
     pub auth_state: AuthState,
@@ -27,7 +26,6 @@ impl AppState {
         (
             Self {
                 db: None,
-                event_bus: EventBus::new(100),
                 instance: InstanceState::default(),
                 ui_state: UiState::default(),
                 auth_state: AuthState::default(),

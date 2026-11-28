@@ -1,4 +1,4 @@
-use lighty_launcher::{Launch, Loader, UserProfile, VersionBuilder, event::EventBus};
+use lighty_launcher::{Launch, Loader, UserProfile, VersionBuilder, event::EVENT_BUS};
 
 use crate::db::instance_model::{InstanceModel, LoaderModel};
 
@@ -77,11 +77,7 @@ impl From<&InstanceLoader> for Loader {
     }
 }
 
-pub async fn load_instance(
-    profile: &UserProfile,
-    event_bus: &EventBus,
-    instance: &Instance,
-) -> anyhow::Result<()> {
+pub async fn load_instance(profile: &UserProfile, instance: &Instance) -> anyhow::Result<()> {
     // criar uma instancia passando o nome, loader, loader versions(vanilla não precisa) e game version
     let mut instance = VersionBuilder::new(
         &instance.name,
@@ -92,7 +88,7 @@ pub async fn load_instance(
 
     instance
         .launch(profile, lighty_launcher::JavaDistribution::Temurin)
-        .with_event_bus(&event_bus)
+        .with_event_bus(&EVENT_BUS)
         .run()
         .await?;
     Ok(())
